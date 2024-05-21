@@ -2,13 +2,13 @@ let ws;
 document.getElementById('connect').onclick = () => {
   ws = new WebSocket(`ws://${window.location.host}`);
   ws.onopen = () => {
-    document.getElementById('messages').innerHTML += '<p>Tome ta conectaco com sucesso</p>';
+    document.getElementById('messages').innerHTML += '<p>Tome ta conectado com sucesso</p>';
   };
   ws.onmessage = (event) => {
     document.getElementById('messages').innerHTML += `<p>Enviado: ${event.data}</p>`;
   };
   ws.onclose = () => {
-    document.getElementById('messages').innerHTML += '<p>Desconectado se acabou ai</p>';
+    document.getElementById('messages').innerHTML += '<p>Desconectado, se acabou ai</p>';
   };
 };
 

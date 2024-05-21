@@ -4,13 +4,22 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WebSocket Test</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-  <h1>WebSocket Test</h1>
-  <button id="connect">Connect</button>
-  <button id="send">Send Message</button>
-  <div id="messages"></div>
+  <div class="container mt-5">
+    <h1 class="text-center">WebSocket Test</h1>
+    <div class="text-center">
+      <button id="connect" class="btn btn-primary m-2">Connect</button>
+      <button id="send" class="btn btn-success m-2">Send Message</button>
+    </div>
+    <div id="messages" class="mt-4 border p-3 bg-light"></div>
+  </div>
 
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   <script src="/main.js"></script>
 </body>
 </html>
