@@ -1,9 +1,23 @@
 body {
-    background-color: #f8f9fa;
-  }
-  
-  #messages {
-    height: 200px;
-    overflow-y: auto;
-  }
-  
+  background-color: #f8f9fa;
+}
+
+#messages {
+  height: 150px;
+  overflow-y: auto;
+}
+
+.choice-btn {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.choice-btn.correct {
+  background-color: #28a745;
+  color: white;
+}
+
+.choice-btn.incorrect {
+  background-color: #dc3545;
+  color: white;
+}

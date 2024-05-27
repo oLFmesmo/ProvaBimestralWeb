@@ -1,0 +1,23 @@
+[
+    {
+      "question": "Qual item você faz contra tank?",
+      "choices": ["Dominik", "Draktar", "Tabi Ninja", "Tiamat"],
+      "answer": "Dominik"
+    },
+    {
+      "question": "Todos são itens de assassino, exceto?",
+      "choices": ["Serylda's", "Presa da Serpente", "Bastão das Eras", "Youmuu"],
+      "answer": "Bastão das Eras"
+    },
+    {
+      "question": "Se você perdeu a lane, de quem é a culpa??",
+      "choices": ["Sua", "Do suporte", "Do Top", "Do Jungler"],
+      "answer": "Do Jungler"
+    },
+    {
+        "question": "Um item que não está mais no jogo",
+        "choices": ["Zz'Rot", "Gume do Infinito", "Fulgor", "Cajado do Vazio"],
+        "answer": "Paris"
+      }
+  ]
+  
