@@ -8,93 +8,160 @@ const fs = require('fs');
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Configura o EJS como mecanismo de visualização
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '../views'));
 
-// Carrega as perguntas do arquivo JSON
 const questions = JSON.parse(fs.readFileSync(path.join(__dirname, 'questions.json'), 'utf8'));
 
-// Cria um servidor HTTP
 const server = http.createServer(app);
-
-// Cria uma instância do WebSocket Server
 const wss = new WebSocket.Server({ server });
 
 let players = [];
-let currentQuestionIndex = 0;
+let gameActive = false;
+let admin;
 
-// Função para enviar a próxima pergunta
-const sendQuestion = () => {
-  if (currentQuestionIndex < questions.length) {
-    const question = questions[currentQuestionIndex];
-    players.forEach(player => {
-      player.ws.send(JSON.stringify({ type: 'question', data: question }));
-    });
+const sendQuestion = (player) => {
+  if (player.currentQuestionIndex < questions.length) {
+    const question = questions[player.currentQuestionIndex];
+    player.ws.send(JSON.stringify({ type: 'question', data: question }));
+    console.log(`Enviando pergunta ${player.currentQuestionIndex + 1} para Jogador ${player.playerNumber}: ${question.question}`);
   } else {
-    determineWinner();
+    stopTimer(player);
+    player.ws.send(JSON.stringify({ type: 'end', message: `Você completou o quiz! Sua pontuação: ${player.score}. Tempo: ${player.time.toFixed(2)} segundos.` }));
+    console.log(`Jogador ${player.playerNumber} completou o quiz.`);
+    checkGameEnd();
   }
 };
 
-// Função para determinar o vencedor
 const determineWinner = () => {
   if (players.length < 2) return;
 
-  const [player1, player2] = players;
-  let message;
+  const sortedPlayers = players.sort((a, b) => {
+    if (b.score === a.score) {
+      return a.time - b.time;
+    }
+    return b.score - a.score;
+  });
+  const winner = sortedPlayers[0];
 
-  if (player1.score > player2.score) {
-    message = `Jogador 1 venceu com ${player1.score} pontos!`;
-  } else if (player2.score > player1.score) {
-    message = `Jogador 2 venceu com ${player2.score} pontos!`;
-  } else {
-    message = `Empate! Ambos os jogadores terminaram com ${player1.score} pontos.`;
-  }
+  const message = `Jogador ${winner.playerNumber} venceu com ${winner.score} pontos! Tempo: ${winner.time.toFixed(2)} segundos.`;
 
   players.forEach(player => {
     player.ws.send(JSON.stringify({ type: 'end', message }));
   });
+
+  gameActive = false;
+  console.log('O jogo terminou. Reinicialização agora permitida.');
 };
 
-// Configura o WebSocket Server para aceitar conexões de clientes
-wss.on('connection', (ws) => {
-  if (players.length < 2) {
-    const player = { ws, score: 0 };
-    players.push(player);
-    ws.send(JSON.stringify({ type: 'message', data: `Bem-vindo ao servidor WebSocket! Você é o jogador ${players.length}.` }));
-    console.log(`Jogador ${players.length} conectado`);
+const checkGameEnd = () => {
+  const allPlayersFinished = players.every(player => player.currentQuestionIndex >= questions.length);
+  if (allPlayersFinished) {
+    determineWinner();
+  }
+};
 
-    if (players.length === 2) {
-      currentQuestionIndex = 0;
-      sendQuestion();
+const resetGame = () => {
+  console.log('Reiniciando o jogo...');
+  players.forEach(player => {
+    player.score = 0;
+    player.currentQuestionIndex = 0;
+    player.time = 0;
+  });
+  gameActive = true;
+  players.forEach(player => {
+    sendQuestion(player);
+    startTimer(player);
+  });
+};
+
+const startTimer = (player) => {
+  player.startTime = Date.now();
+  console.log(`Timer iniciado para Jogador ${player.playerNumber}`);
+};
+
+const stopTimer = (player) => {
+  const now = Date.now();
+  player.time += (now - player.startTime) / 1000;
+  console.log(`Timer parado para Jogador ${player.playerNumber}. Tempo total: ${player.time.toFixed(2)} segundos.`);
+  sendTimeUpdate(player);
+};
+
+const sendTimeUpdate = (player) => {
+  player.ws.send(JSON.stringify({ type: 'time', time: player.time.toFixed(2) }));
+  console.log(`Atualização de tempo enviada para Jogador ${player.playerNumber}: ${player.time.toFixed(2)} segundos`);
+};
+
+wss.on('connection', (ws) => {
+  console.log('Nova conexão WebSocket');
+  if (players.length < 10) {
+    const isAdmin = players.length === 0;
+    const player = { ws, score: 0, isAdmin, playerNumber: players.length + 1, currentQuestionIndex: 0, time: 0, startTime: 0 };
+    players.push(player);
+
+    ws.send(JSON.stringify({ type: 'message', data: `Bem-vindo ao servidor WebSocket! Você é o jogador ${player.playerNumber}.` }));
+    console.log(`Jogador ${player.playerNumber} conectado. Admin: ${isAdmin}`);
+
+    if (isAdmin) {
+      admin = player;
+      ws.send(JSON.stringify({ type: 'message', data: 'Você é o administrador. Você pode iniciar o jogo.' }));
+      if (!gameActive && players.length > 1) {
+        ws.send(JSON.stringify({ type: 'startGameButton' }));
+      }
+    } else {
+      if (gameActive) {
+        ws.send(JSON.stringify({ type: 'message', data: 'O jogo já está em andamento. Por favor, aguarde a próxima partida.' }));
+      }
     }
   } else {
-    ws.send(JSON.stringify({ type: 'message', data: 'O jogo já está em andamento. Por favor, aguarde a próxima partida.' }));
+    ws.send(JSON.stringify({ type: 'message', data: 'O limite de jogadores foi atingido. Não é possível entrar mais jogadores.' }));
+    console.log('Conexão recusada. Limite de jogadores atingido.');
   }
 
   ws.on('message', (message) => {
     const receivedMessage = JSON.parse(message);
-    if (receivedMessage.type === 'answer') {
-      const userAnswer = receivedMessage.data;
-      const currentQuestion = questions[currentQuestionIndex];
+    console.log(`Mensagem recebida de Jogador ${players.find(p => p.ws === ws)?.playerNumber || 'desconhecido'}:`, receivedMessage);
+    const player = players.find(p => p.ws === ws);
 
-      const player = players.find(p => p.ws === ws);
-      let correctAnswer = currentQuestion.answer;
+    if (receivedMessage.type === 'answer' && gameActive) {
+      const userAnswer = receivedMessage.data;
+      const currentQuestion = questions[player.currentQuestionIndex];
+      const correctAnswer = currentQuestion.answer;
+
       if (userAnswer === correctAnswer) {
         player.score += 1;
+        player.ws.send(JSON.stringify({
+          type: 'feedback',
+          message: 'Resposta correta!',
+          correct: correctAnswer,
+          score: player.score
+        }));
+        console.log(`Jogador ${player.playerNumber} respondeu corretamente. Pontuação: ${player.score}`);
+      } else {
+        player.ws.send(JSON.stringify({
+          type: 'feedback',
+          message: 'Resposta incorreta.',
+          correct: correctAnswer,
+          score: player.score
+        }));
+        console.log(`Jogador ${player.playerNumber} respondeu incorretamente. Pontuação: ${player.score}`);
       }
 
-      player.ws.send(JSON.stringify({
-        type: 'feedback',
-        message: userAnswer === correctAnswer ? 'Resposta correta!' : 'Resposta incorreta.',
-        correct: correctAnswer,
-        score: player.score
-      }));
+      player.currentQuestionIndex += 1;
+      stopTimer(player);
+      sendQuestion(player);
+      startTimer(player);
 
-      if (players.every(p => p.ws.readyState === WebSocket.OPEN)) {
-        currentQuestionIndex += 1;
-        sendQuestion();
-      }
+    } else if (receivedMessage.type === 'reset' && player.isAdmin && !gameActive) {
+      console.log('Solicitação de reinício recebida do administrador.');
+      resetGame();
+    } else if (receivedMessage.type === 'reset' && !player.isAdmin) {
+      console.log('Jogador não autorizado tentou reiniciar o jogo.');
+    } else if (receivedMessage.type === 'reset' && gameActive) {
+      console.log('Reinicialização solicitada enquanto o jogo ainda está ativo.');
+    } else if (receivedMessage.type === 'startGame' && player.isAdmin && !gameActive && players.length > 1) {
+      console.log('Iniciando o jogo...');
+      resetGame();
     }
   });
 
@@ -104,15 +171,12 @@ wss.on('connection', (ws) => {
   });
 });
 
-// Middleware para servir arquivos estáticos
 app.use(express.static(path.join(__dirname, '../public')));
 
-// Rota inicial
 app.get('/', (req, res) => {
   res.render('index');
 });
 
-// Inicia o servidor HTTP e WebSocket
 server.listen(port, () => {
   console.log(`Servidor rodando em http://localhost:${port}`);
 });

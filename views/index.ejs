@@ -12,16 +12,23 @@
     <h1 class="text-center">WebSocket Quiz</h1>
     <div class="text-center">
       <button id="connect" class="btn btn-primary m-2">Connect</button>
+
+      <div id="reset-container" style="display: none;">
+        <button id="start-game-button" class="btn btn-success m-2" >Iniciar Jogo</button>
+
+        <button id="reset" class="btn btn-danger m-2" disabled>Reiniciar Jogo</button>
+      </div>
     </div>
     <div id="messages" class="mt-4 border p-3 bg-light"></div>
     <div id="questions" class="mt-4"></div>
     <div id="score" class="mt-4 text-center font-weight-bold">Pontuação: 0</div>
+    <div id="time" class="mt-4 text-center font-weight-bold">Tempo: 0 segundos</div>
   </div>
 
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.0.1/confetti.min.js"></script> <!-- Adicione o script do canvas-confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.0.1/confetti.min.js"></script>
   <script src="/main.js" type="module"></script>
 </body>
 </html>

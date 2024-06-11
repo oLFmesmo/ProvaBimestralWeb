@@ -1,23 +1,82 @@
 [
-    {
-      "question": "Qual item você faz contra tank?",
-      "choices": ["Dominik", "Draktar", "Tabi Ninja", "Tiamat"],
-      "answer": "Dominik"
-    },
-    {
-      "question": "Todos são itens de assassino, exceto?",
-      "choices": ["Serylda's", "Presa da Serpente", "Bastão das Eras", "Youmuu"],
-      "answer": "Bastão das Eras"
-    },
-    {
-      "question": "Se você perdeu a lane, de quem é a culpa??",
-      "choices": ["Sua", "Do suporte", "Do Top", "Do Jungler"],
-      "answer": "Do Jungler"
-    },
-    {
-        "question": "Um item que não está mais no jogo",
-        "choices": ["Zz'Rot", "Gume do Infinito", "Fulgor", "Cajado do Vazio"],
-        "answer": "Paris"
-      }
-  ]
-  
+  {
+    "question": "Qual item você faz contra tank?",
+    "choices": [
+      "Dominik",
+      "Draktar",
+      "Tabi Ninja",
+      "Tiamat"
+    ],
+    "answer": "Dominik"
+  },
+  {
+    "question": "Todos são itens de assassino, exceto?",
+    "choices": [
+      "Serylda's",
+      "Presa da Serpente",
+      "Bastão das Eras",
+      "Youmuu"
+    ],
+    "answer": "Bastão das Eras"
+  },
+  {
+    "question": "Se você perdeu a lane, de quem é a culpa??",
+    "choices": [
+      "Sua",
+      "Do suporte",
+      "Do Top",
+      "Do Jungler"
+    ],
+    "answer": "Do Jungler"
+  },
+  {
+    "question": "Um item que não está mais no jogo",
+    "choices": [
+      "Zz'Rot",
+      "Gume do Infinito",
+      "Fulgor",
+      "Cajado do Vazio"
+    ],
+    "answer": "Zz'Rot"
+  },
+  {
+    "question": "Na lore de League of Legends, Aatrox é um:",
+    "choices": [
+      "Ascendente",
+      "Anjo Caído",
+      "Yordle",
+      "Darkin"
+    ],
+    "answer": "Darkin"
+  },
+  {
+    "question": "Na skin padrão de Jax, quantos olhos ele tem?",
+    "choices": [
+      "Cinco",
+      "Seis",
+      "Sete",
+      "Oito"
+    ],
+    "answer": "Seis"
+  },
+  {
+    "question": "Um jogador ao terminar a partida observou seu placar e estava em 7/5/13. Qual seu KDA(AMA)?",
+    "choices": [
+      "4:1",
+      "4:5",
+      "2,5:1",
+      "20:5"
+    ],
+    "answer": "4:1"
+  },
+  {
+    "question": "Qual nome do animal do Kled ?",
+    "choices": [
+      "Skaarl",
+      "Sckar",
+      "Scaar",
+      "Sckaar"
+    ],
+    "answer": "Skaarl"
+  }
+]
